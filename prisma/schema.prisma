@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  bookings     Booking[]
+}
+
+model Hotel {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  nameAr        String
+  city          String
+  cityAr        String
+  country       String
+  countryAr     String
+  starRating    Int
+  rating        Float
+  reviews       Int
+  pricePerNight Int
+  description   String
+  descriptionAr String
+  images        String // JSON-encoded string[]
+  amenities     String // JSON-encoded string[]
+  createdAt     DateTime @default(now())
+}
+
+model Package {
+  id              String @id @default(cuid())
+  slug            String @unique
+  title           String
+  titleAr         String
+  destination     String
+  destinationAr   String
+  image           String
+  nights          Int
+  flightSummary   String
+  flightSummaryAr String
+  hotelSummary    String
+  hotelSummaryAr  String
+  price           Int
+  discountPct     Int
+  description     String
+  descriptionAr   String
+}
+
+model Offer {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  titleAr       String
+  description   String
+  descriptionAr String
+  image         String
+  discountPct   Int
+  destination   String
+  destinationAr String
+  code          String
+  validUntil    DateTime
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  reference  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String // flight | hotel | package
+  status     String   @default("confirmed")
+  currency   String   @default("SAR")
+  totalPrice Int
+  details    String // JSON snapshot of the booked item + passengers
+  createdAt  DateTime @default(now())
+}
